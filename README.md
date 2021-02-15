@@ -8,6 +8,8 @@
 
 ### Usage
 * Make sure the configuration file is updated according to describtion in the [configuration](https://github.com/ClaudiuGeorgiu/PlaystoreDownloader#-configuration)
+* Update the path of folder `Downloads` in `app_review_downloader.py`
+* Run in command line 
 ```Python
 python app_review_downloader.py [-h] [-t CATEGORY] [-n NUMBER] [-d DETAIL] [-c COLLECTION] [-r N_REVIEWS]
 ```
@@ -78,4 +80,41 @@ Note that the `CATEGARY` will be set to "Application" as there is no category fo
 ```Python
 python app_review_downloader.py -c NEW_FAMILY -t FAMILY -n 100 -r 2000
 ```
+## Comments extractor
+### Usage
+* Run in command line 
+```Python
+python comments_extractor.py -f FOLDERNAME [-r RATING]
+```
+#### Parameter
+* `-f` is the folder name where the downloaded apps and reviews are stored, e.g., `Education_11Feb2021_184`.
+* `-r` is the rating of comments that will be extracted (1-5). Default = 1.
+#### Example
+* To extract all the reviews rated as `2` that stored in the folder ".\Downloads\Entertainment_11Feb2021_134":
+```Python
+python comments_extractor.py -f Entertainment_11Feb2021_134 -r 2
+```
+#### Output
+* Path: .\Downloads\Entertainment_11Feb2021_134\comment.txt
+* One comment per line
 
+## BTM
+### BTM training
+#### Usage
+* Install [BTM package](https://github.com/markoarnauto/biterm)
+* Set the path in `btm_training.py`
+* Run in command line
+```Python
+python btm_training.py [-n N_REVIEWS] [-t N_TOPICS] [-s CHUNK_SIZE] [-o OUTPUT_FILENAME]
+```
+#### Parameters
+* `-n` is the number of reviews that are randomly selected as training samples. Default = 1000. If n = -1, all reviews will be selected.
+* `-t` is the number of topics/clusters will be assigned. Default = 20.
+* `-s` is the number of samples (a chunck) will be input to online training in each round.
+* `-o` is the root name of output files. Default = "btm".
+#### Examples
+* To train a BTM model with 3,000 reviews and output into 30 topics:
+```Python
+python btm_training.py -n 3000 -t 30
+```
+The vocabulary will be output as `btm_3000_30.vcb`. The trained model will be output as `btm_3000_30.mdl`.
