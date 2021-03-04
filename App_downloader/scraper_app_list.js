@@ -4,7 +4,32 @@ var gplay = require('google-play-scraper');
 var category = process.argv[2];
 var collection = process.argv[3];
 var num = process.argv[4];
-var path = process.argv[5] + "App_list\\"
+var path = process.argv[5] + "App_list\\";
+
+function formatDate(date) {
+  if (date !== undefined && date !== "") {
+    var myDate = new Date(date);
+    var month = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ][myDate.getMonth()];
+    var str = myDate.getDate() + month + myDate.getFullYear();
+    return str;
+  }
+  return "";
+}
+
+var filename = 'list_' + category + '_' + collection + '_' + formatDate(new Date()) + '_' + num;
 
 gplay.list({
   category: category,
@@ -17,9 +42,9 @@ gplay.list({
   if(!fs.existsSync(path)){
     fs.mkdirSync(path);
   }
-  fs.writeFile(path + 'list_' + category + '_' + collection + '_' + num + '.json', JSON.stringify(result), function (err) {
+  fs.writeFile(path + filename + '.json', JSON.stringify(result), function (err) {
     if (err) return console.log(err);
-    console.log('list_' + category + '_' + collection + '_' + num + ' is generated.');
+    console.log(filename + ' is generated.');
   });
 });
 

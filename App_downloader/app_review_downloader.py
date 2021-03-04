@@ -13,7 +13,7 @@ path = "C:\\Age_Rating\\App_downloader\\Downloads\\"
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-t', metavar='CATEGORY', type=str, default='APPLICATION', help='The category of apps.')
-parser.add_argument('-n', metavar='NUMBER', type=str, default='5', help='The number of apps.')
+parser.add_argument('-n', metavar='NUMBER', type=str, default='200', help='The number of apps.')
 parser.add_argument('-c', metavar='COLLECTION', type=str, default='TOP_FREE', help='The collection of apps.')
 parser.add_argument('-r', metavar='N_REVIEWS', type=str, default='3000', help='Number of reviews to download.')
 args = parser.parse_args()
@@ -24,8 +24,8 @@ collection = args.c
 reviews = args.r
 
 os.system('node scraper_app_list.js ' + category + ' ' + collection + ' ' + num + ' ' + path)
+path_json = path + "App_list\\" + os.listdir(path + "App_list\\")[0]
 
-path_json = path + "App_list\\list_" + category + "_" + collection + '_'  + num + ".json"
 with open(path_json, "r", encoding="utf8") as load_f:
     load_arr = json.load(load_f)
     
