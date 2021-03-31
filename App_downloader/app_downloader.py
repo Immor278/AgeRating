@@ -16,10 +16,12 @@ class App_downloader:
     n_reviews = 3000
     store = ''
     app_list = ''
+    category = ''
 
-    def __init__(self, store, app_list):
+    def __init__(self, store, app_list, category):
         self.set_store(store)
         self.set_app_list(app_list)
+        self.set_category(category)
         
     def download_by_category(self, category):
         app_list = obtain_app_list(category, self.type, str(self.n_apps), self.save_path)
@@ -28,7 +30,7 @@ class App_downloader:
 
     def download_by_app_list(self): 
         category = '_'.join(self.app_list.split(os.path.sep)[-1].split('_')[1:-3])
-        download_app_and_review(self.app_list, self.n_reviews, self.save_path)
+        download_app_and_review(self.app_list, str(self.n_reviews), self.save_path)
         self.clean_up(category)
 
     def download_by_app_list_apkpure(self):
@@ -55,14 +57,17 @@ class App_downloader:
         misc.rename_folder_by_size(save_path, misc.get_n_files(apk_folder))
 
     def start_download(self):
-        if self.app_list == '':
+        if self.app_list == '':     # download by categories
             for category in self.categories:
                 self.download_by_category(category)
-        else:
+        elif self.category == '':   # download by app list
             if self.store == 'google':
                 self.download_by_app_list()
             elif self.store == 'apkpure':
                 self.download_by_app_list_apkpure()
+                
+        else:                       # download a specific category
+            self.download_by_category(self.category)
 
     def set_store(self, store):
         if store:
@@ -71,6 +76,10 @@ class App_downloader:
     def set_app_list(self, app_list):
         if app_list:
             self.app_list = app_list
+
+    def set_category(self, category):
+        if category:
+            self.category = category
 
     categories = [
         # 'ANDROID_WEAR',
@@ -113,9 +122,10 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-l', metavar='APP_LIST', type=str, help='The path to app_list.')
     parser.add_argument('-s', metavar='STORE', type=str, default='google', help='The app store, google or apkpure.')
+    parser.add_argument('-c', metavar='CATEGORY', type=str, help='The category of app.')
     args = parser.parse_args()
 
-    App_downloader(args.s, args.l).start_download()
+    App_downloader(args.s, args.l, args.c).start_download()
 
 if __name__ == "__main__":
     main()
