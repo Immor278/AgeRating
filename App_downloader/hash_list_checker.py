@@ -2,29 +2,35 @@
 
 import hashlib
 import os
+import sys
 
 def hash_apk(apk_path):
-    with open(apk_path, "rb") as apk:
-        md5Hash = hashlib.md5(apk.read()).hexdigest()
-        return md5Hash
+    try:
+        with open(apk_path, "rb") as apk:
+            return hashlib.md5(apk.read()).hexdigest()
+    except:
+        print(apk_path, "removed by firewall!")
 
-def is_hash_existed(hash_value, list_path):
+def is_value_existed(hash_value, list_path):
     with open(list_path, "r", encoding="utf8") as list:
         if hash_value in list.read():
             return True
 
 def update_hash_list(apk, list_path):
     md5 = hash_apk(apk)
-    if os.path.exists(list_path) and is_hash_existed(md5, list_path):
-        print("apk existed: " + apk.split(os.path.sep)[-1])
+    package_name = apk.split(os.path.sep)[-1].split(' - ')[-1]
+    folder = os.path.dirname(apk).split(os.path.sep)[-2]
+
+    if os.path.exists(list_path) and is_value_existed(md5, list_path):
+        print("apk existed: " + package_name)
     else:
         # print("write: "  + apk.split(os.path.sep)[-1])
-        with open(list_path, "a", encoding="utf8") as list:
-            list.write(str(md5) + '\t' + apk.split(os.path.sep)[-1] + "\n")
+        with open(list_path, "a+", encoding="utf8") as list:
+            list.write(str(md5) + '\t' + package_name + '\t' + folder + "\n")
             return True
 
 def main():
-    folder = "Education_11Feb2021_184"
+    folder = sys.argv[1]
     path = "C:\\Age_Rating\\App_downloader\\Downloads\\" + folder + "\\APKs\\"
     list_path = "C:\\Age_Rating\\App_downloader\\Downloads\\Hash_list\\hash_list.txt"
 

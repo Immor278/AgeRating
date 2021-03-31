@@ -36,3 +36,14 @@ adb uninstall your.app.package.name
 ```
 adb pull /data/data/edu.berkeley.icsi.haystack/databases/haystack.db output_path
 ```
+#### disable verification
+```
+adb shell settings put global verifier_verify_adb_installs 0
+adb shell settings put global package_verifier_enable 0
+```
+
+#### Lumen
+package  edu.berkeley.icsi.haystack
+```
+adb shell pidof edu.berkeley.icsi.haystack
+```

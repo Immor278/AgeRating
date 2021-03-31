@@ -3,44 +3,110 @@ import json
 import os
 import time
 import sys
+sys.path.insert(1, 'C:\Age_Rating\ApkPure')
+from apis.api import ApkPure
 
 # for (dirpath, dirnames, filenames) in os.walk('/dtpishu/mph/playScraper/results'):
 #     for name in filenames:
 
 # thepath = os.path.join(dirpath, name)
 
-path = "C:\\Age_Rating\\App_downloader\\Downloads\\"
+age_ratings = [
+    # 'Manga 18+',
+    # 'Mature 17+',
+    'Teen',
+    'Everyone 10+',
+    'Everyone',
+]
 
-parser = argparse.ArgumentParser()
-parser.add_argument('-t', metavar='CATEGORY', type=str, default='APPLICATION', help='The category of apps.')
-parser.add_argument('-n', metavar='NUMBER', type=str, default='200', help='The number of apps.')
-parser.add_argument('-c', metavar='COLLECTION', type=str, default='TOP_FREE', help='The collection of apps.')
-parser.add_argument('-r', metavar='N_REVIEWS', type=str, default='3000', help='Number of reviews to download.')
-args = parser.parse_args()
+def obtain_app_list(category, collection, n_apps, folder_path):
+    os.system('node scraper_app_list.js ' + category + ' ' + collection + ' ' + n_apps + ' ' + folder_path)
+    return folder_path + "App_list\\" + os.listdir(folder_path + "App_list\\")[0]
 
-category = args.t
-num = args.n
-collection = args.c
-reviews = args.r
+def download_app_and_review(path_json, reviews, folder_path):
+    with open(path_json, "r", encoding="utf8") as load_f:
+        load_arr = json.load(load_f)
 
-os.system('node scraper_app_list.js ' + category + ' ' + collection + ' ' + num + ' ' + path)
-path_json = path + "App_list\\" + os.listdir(path + "App_list\\")[0]
+        for item in load_arr:
+            # if item["contentRating"] != 'Mature 17+' and item["contentRating"] != 'Adults only 18+':
+            if item["contentRating"] in age_ratings:
+                appId = item["appId"]
+                os.system('pipenv run python download.py ' + appId)
+                if reviews != '0':
+                    os.system('node scraper_reviews.js ' + appId + ' ' + reviews + ' ' + folder_path)
+                print("done", appId)
+                time.sleep(1)
+                # if item["contentRating"] != 'Mature 17+' and item["contentRating"] != 'Adults only 18+':
+                #     print(item["contentRating"],'|',item["title"])
+            else:
+                print('Content rating not fit: ', item["contentRating"],'|',item["title"])
 
-with open(path_json, "r", encoding="utf8") as load_f:
-    load_arr = json.load(load_f)
-    
-    # print(len(load_arr))
+def download_app_apkpure(path_json, folder_path):
+    with open(path_json, "r", encoding="utf8") as load_f:
+        load_arr = json.load(load_f)
 
-    for item in load_arr:
-        appId = item["appId"]
-        # name = item["title"]
-        os.system('pipenv run python download.py ' + appId)
-        if reviews != '0':
-            os.system('node scraper_reviews.js ' + appId + ' ' + reviews + ' ' + path)
-        print("done", appId)
-        time.sleep(1)
-        # if item["contentRating"] != 'Mature 17+' and item["contentRating"] != 'Adults only 18+':
-        #     print(item["contentRating"],'|',item["title"])
+        for item in load_arr:
+            # if item["contentRating"] != 'Mature 17+' and item["contentRating"] != 'Adults only 18+':
+            if item["contentRating"] in age_ratings:
+                package_name = item["appId"]
+                print("Download start ... " + package_name)
+                try:
+                    api = ApkPure(return_as="dict")
+                    find = api._search(package_name)
+                    detail = api.this_detail(find, 1)
+                    api.download_(url=detail.url_download, name=package_name, ex=detail.extension, path=folder_path)
+                except:
+                    print("Issue")
+                    continue
+                else:
+                    print("Not found in ApkPure")
+                
+                # os.system('pipenv run python download.py ' + appId)
+                # if reviews != '0':
+                #     os.system('node scraper_reviews.js ' + appId + ' ' + reviews + ' ' + folder_path)
+                # print("done", appId)
+                time.sleep(1)
+                # if item["contentRating"] != 'Mature 17+' and item["contentRating"] != 'Adults only 18+':
+                #     print(item["contentRating"],'|',item["title"])
+            else:
+                print('Content rating not fit: ', item["contentRating"],'|',item["title"])
+
+def main():
+    path = "C:\\Age_Rating\\App_downloader\\Downloads\\"
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-t', metavar='CATEGORY', type=str, default='APPLICATION', help='The category of apps.')
+    parser.add_argument('-n', metavar='NUMBER', type=str, default='200', help='The number of apps.')
+    parser.add_argument('-c', metavar='COLLECTION', type=str, default='TOP_FREE', help='The collection of apps.')
+    parser.add_argument('-r', metavar='N_REVIEWS', type=str, default='3000', help='Number of reviews to download.')
+    args = parser.parse_args()
+
+    category = args.t
+    num = args.n
+    collection = args.c
+    reviews = args.r
+
+    path_json = obtain_app_list(category, collection, num, path)
+    download_app_and_review(path_json, reviews, path)
+
+    with open(path_json, "r", encoding="utf8") as load_f:
+        load_arr = json.load(load_f)
+        
+        # print(len(load_arr))
+
+        for item in load_arr:
+            appId = item["appId"]
+            # name = item["title"]
+            os.system('pipenv run python download.py ' + appId)
+            if reviews != '0':
+                os.system('node scraper_reviews.js ' + appId + ' ' + reviews + ' ' + path)
+            print("done", appId)
+            time.sleep(1)
+            # if item["contentRating"] != 'Mature 17+' and item["contentRating"] != 'Adults only 18+':
+            #     print(item["contentRating"],'|',item["title"])
+
+if __name__ == "__main__":
+    main()
 
 # TOP_FREE = 'topselling_free',
 # TOP_PAID = 'topselling_paid',
@@ -87,6 +153,7 @@ with open(path_json, "r", encoding="utf8") as load_f:
 # TRAVEL_AND_LOCAL = 'TRAVEL_AND_LOCAL',
 # VIDEO_PLAYERS = 'VIDEO_PLAYERS',
 # WEATHER = 'WEATHER',
+
 # GAME = 'GAME',
 # GAME_ACTION = 'GAME_ACTION',
 # GAME_ADVENTURE = 'GAME_ADVENTURE',

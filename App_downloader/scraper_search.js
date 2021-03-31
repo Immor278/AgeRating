@@ -12,7 +12,8 @@ var path = "C:\\Age_Rating\\App_downloader\\Downloads\\";
 
 gplay.search({
     term: term,
-    num: 2
+    num: 5,
+    fullDetail: true
   })
 .then((result)=>{
   fs = require('fs');

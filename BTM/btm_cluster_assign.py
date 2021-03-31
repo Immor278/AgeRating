@@ -2,89 +2,65 @@
 
 import numpy as np
 import random
-# import pyLDAvis
 import argparse
 import pickle
+from btm_training import select_samples, create_btm
 from biterm.btm import oBTM
 from sklearn.feature_extraction.text import CountVectorizer
 from biterm.utility import vec_to_biterms, topic_summuary
 
-path = "C:\\Age_Rating\\App_downloader\\BTM\\"
+def load_pickle(filename):
+    with open(filename,'rb') as file:
+        obj = pickle.load(file)
+    return obj
 
-parser = argparse.ArgumentParser()
-parser.add_argument('-n', metavar='number', type=int, default=10000, help='The number of input reviews.')
-parser.add_argument('-f', metavar='filename', type=str, required=True, help='filename of btm obj and vocabulary files.')
+def assign_cluster(data_set, btm, vocab, output=True):
+    _, biterms, X, _ = create_btm(data_set, vcb=vocab)
+    result = btm.transform(biterms)
 
-args = parser.parse_args()
+    if output==True:
+        print("\n\n Topic coherence ..")
+        topic_summuary(btm.phi_wz.T, X, vocab, 20)
+    
+    return result
 
-num = args.n
-filename = args.f
+def display(data_set, result, n_top):
+    n_sample, n_topic  = result.shape
+    top = np.zeros((n_topic, n_top, 2))
+    result_summary = np.zeros([n_sample, 3])
 
-# Randomly select training samples
-texts = open('./data/comments.txt',encoding="utf8").read().splitlines()
-if num == -1:
-    num = len(texts)
-if num < len(texts):
-    texts = random.sample(texts, num)
-print('Set size of input sets as: ' + str(num) + '.')
+    for i in range(n_sample):
+        result_summary[i] = [result[i].argmax(), max(result[i]), i]
 
+    for pair in result_summary:
+        if top[int(pair[0])][0][0] < pair[1]:
+            top[int(pair[0])][0] = [pair[1], pair[2]]
+            for i in range(len(top)):
+                top[i] = top[i][top[i][:,0].argsort()]
 
-with open(filename + '.vcb','rb') as file_vcb:
-    vcb = pickle.load(file_vcb)
+    for i in range(len(top)):
+        for top_topic in top[i]:
+            print("(topic: {}) {} ".format(i, data_set[int(top_topic[1])]))
 
-with open(filename + '.obj','rb') as file_btm:
-    btm = pickle.load(file_btm)
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-n', metavar='NUMBER', type=int, default=10000, help='The number of input reviews.')
+    parser.add_argument('-m', metavar='INPUT', type=str, required=True, help='Filename of btm obj and vocabulary files.')
+    parser.add_argument('-d', metavar='DATA', type=str, default='./data/comments.txt', help='Path to comments.')
 
-# vectorize texts
-vec = CountVectorizer(vocabulary=vcb)
-# # ,min_df=0.0001,max_df=0.05
-# # X = vec.fit_transform(texts).toarray()
-X = np.array(vec.fit_transform(texts).toarray())
-# # print(X)
+    args = parser.parse_args()
 
-# print('get vocabulary')
-# vocab = np.array(vec.get_feature_names())
+    num = args.n
+    model = args.m
+    data_path = args.d
 
-# # print(vocab[:500])
-# # print(len(vocab))
+    data_set = select_samples(data_path, num)
+    vcb = load_pickle(model + '.vcb')
+    btm = load_pickle(model + '.mdl')
 
-# print('get biterms')
-biterms = vec_to_biterms(X)
+    result = assign_cluster(data_set, btm, vcb)
 
-# print('create btm')
-# btm = oBTM(num_topics=30, V=vcb)
+    display(data_set, result, 10)
 
-# print("\n\n Train Online BTM ..")
-# for i in range(0, int(len(biterms)), 100): # prozess chunk of 200 texts
-#     biterms_chunk = biterms[i:i + 100]
-#     btm.fit(biterms_chunk, iterations=50)
-# # biterms_chunk = biterms[:n]
-# # btm.fit(biterms_chunk, iterations=50)
-
-# object_btm = btm
-# file_btm_obj = open('btm.obj', 'wb') 
-# pickle.dump(object_btm, file_btm_obj)
-
-# file_btm_obj = open('btm.obj','rb') 
-# btm = pickle.load(file_btm_obj)
-
-topics = btm.transform(biterms)
-
-# print("\n\n Visualize Topics ..")
-# vis = pyLDAvis.prepare(btm.phi_wz.T, topics, np.count_nonzero(X, axis=1), vocab, np.sum(X, axis=0))
-# # pyLDAvis.save_html(vis, './vis/online_btm_' + str(n) + '.html')
-# pyLDAvis.save_html(vis, './vis/online_btm_' + 'online_all2' + '.html')
-
-print("\n\n Topic coherence ..")
-topic_summuary(btm.phi_wz.T, X, vcb, 20)
-
-print("\n\n Texts & Topics ..")
-
-for k in range(3):
-    j = 0
-    for i in range(len(texts)):
-        if topics[i].argmax() == k:
-            print("{} (topic: {})".format(texts[i], topics[i].argmax()))
-            j += 1
-            if j > 10:
-                break
+if __name__ == "__main__":
+    main()
