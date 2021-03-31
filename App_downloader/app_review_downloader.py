@@ -21,14 +21,14 @@ age_ratings = [
 
 def obtain_app_list(category, collection, n_apps, folder_path):
     os.system('node scraper_app_list.js ' + category + ' ' + collection + ' ' + n_apps + ' ' + folder_path)
-    return folder_path + "App_list\\" + os.listdir(folder_path + "App_list\\")[0]
+    folder_path = os.path.join(folder_path, 'App_list')
+    return os.path.join(folder_path, os.listdir(folder_path)[0])
 
 def download_app_and_review(path_json, reviews, folder_path):
     with open(path_json, "r", encoding="utf8") as load_f:
         load_arr = json.load(load_f)
 
         for item in load_arr:
-            # if item["contentRating"] != 'Mature 17+' and item["contentRating"] != 'Adults only 18+':
             if item["contentRating"] in age_ratings:
                 appId = item["appId"]
                 os.system('pipenv run python download.py ' + appId)
@@ -36,8 +36,6 @@ def download_app_and_review(path_json, reviews, folder_path):
                     os.system('node scraper_reviews.js ' + appId + ' ' + reviews + ' ' + folder_path)
                 print("done", appId)
                 time.sleep(1)
-                # if item["contentRating"] != 'Mature 17+' and item["contentRating"] != 'Adults only 18+':
-                #     print(item["contentRating"],'|',item["title"])
             else:
                 print('Content rating not fit: ', item["contentRating"],'|',item["title"])
 

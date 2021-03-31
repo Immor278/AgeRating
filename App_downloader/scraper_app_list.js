@@ -4,7 +4,7 @@ var gplay = require('google-play-scraper');
 var category = process.argv[2];
 var collection = process.argv[3];
 var num = process.argv[4];
-var path = process.argv[5] + "App_list\\";
+var path = process.argv[5] + "\\App_list\\";
 
 function formatDate(date) {
   if (date !== undefined && date !== "") {

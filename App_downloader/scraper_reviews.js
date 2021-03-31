@@ -2,7 +2,7 @@ var gplay = require('google-play-scraper');
 
 var appID = process.argv[2];
 var num = process.argv[3];
-var path = process.argv[4] + "Reviews\\"
+var path = process.argv[4] + "\\Reviews\\"
 
 gplay.reviews({
     appId: appID,
