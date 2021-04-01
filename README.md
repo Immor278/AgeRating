@@ -112,9 +112,44 @@ python btm_training.py -n 3000 -t 30
 The vocabulary will be output as `btm_3000_30.vcb`. The trained model will be output as `btm_3000_30.mdl`.
 
 ## Static Analysis
-### Permission & third-party lib analysis
 
+### Install
+* Install [AndroidGuard](https://github.com/androguard/androguard)
+* Install [LiteRadar](https://github.com/pkumza/LiteRadar). Note that LiteRadar uses Python2, so there could be some bugs in Python3.
+### Permission & third-party lib analysis
+1. Run static analysis
+```Python
+python static_analyzer.py apk_folder
+```
+Output：```apk_folder/Static_results/package_name.json```: json files containing permission and tracker results.
+2. Summarize the static results
+```Python
+python summarize_static_analysis top_apk_folder
+```
+Output: ```top_apk_folder/static_result.txt```: txt file with summarized data seperated by '||', which could be easily imported to Excel.
 ### VirusTotal
+1. Setup the ```api_key```
+2. Upload apk and get reports from VirusTotal. (You may need to run this for several times to collect all reports)
+```Python
+python virus_total.py top_apk_folder
+```
+Output: ```top_apk_folder/vt_restuls.txt```: txt file containing number of engines that detected malware and the package name of corrusponding apk, seperated by '||'.
 
 ## Dynamic Analysis
+### Setup
+1. Install [Lumen](https://play.google.com/store/apps/details?id=edu.berkeley.icsi.haystack) on a rooted Android phone. (Lumen does not require root, but we need to root a device to pull data from it)
 ### Lumen
+1. Get the device ID
+```Bash
+$ adb devices
+```
+2. Run Lumen testing
+```Python
+python lumen_script.py apk_folder device_id
+```
+Output: extract Lumen data after testing every 10 apps as ```apk_folder/lumen_xx.db```
+3. Summarize data 
+```Python
+python summarize_lumen_result.py top_apk_folder
+```
+Output: ```lumen_privacy.txt``` and ```lumen_flow.txt```
