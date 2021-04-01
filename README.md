@@ -148,6 +148,7 @@ $ adb devices
 $ python lumen_script.py apk_folder device_id
 ```
 Output: extract Lumen data after testing every 10 apps as ```apk_folder/lumen_xx.db```
+
 3. Summarize data 
 ```Python
 $ python summarize_lumen_result.py top_apk_folder
