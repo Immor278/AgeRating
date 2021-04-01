@@ -11,7 +11,7 @@
 * Update the path of folder `Downloads` in `app_review_downloader.py`
 * Run in command line 
 ```Python
-python app_downloader.py [-h] [-s STORE] [-l APP_LIST] [-c CATEGORY]
+$ python app_downloader.py [-h] [-s STORE] [-l APP_LIST] [-c CATEGORY]
 ```
 
 #### Available parameters
@@ -60,23 +60,23 @@ FAMILY_PRETEND = 'FAMILY_PRETEND'
 #### Example 1
 * To download top free apps and reviews from google store in each category listed in the ```App_downloader.categories```: 
 ```Python
-python app_downloader.py
+$ python app_downloader.py
 ```
 #### Example 2
 * To download top free apps from google store accoring to an app list:
 ```Python
-python app_review_downloader.py -l path_to_list
+$ python app_review_downloader.py -l path_to_list
 ```
 #### Example 3
 * To download apps from APKpure according to an app list:
 ```Python
-python app_review_downloader.py -s apkpure -l path_to_list
+$ python app_review_downloader.py -s apkpure -l path_to_list
 ```
 ## Comments extractor
 ### Usage
 * Run in command line 
 ```Python
-python comments_extractor.py -f FOLDERNAME [-r RATING]
+$ python comments_extractor.py -f FOLDERNAME [-r RATING]
 ```
 #### Parameter
 * `-f` is the folder name where the downloaded apps and reviews are stored, e.g., `Education_11Feb2021_184`.
@@ -84,7 +84,7 @@ python comments_extractor.py -f FOLDERNAME [-r RATING]
 #### Example
 * To extract all the reviews rated as `2` that stored in the folder ".\Downloads\Entertainment_11Feb2021_134":
 ```Python
-python comments_extractor.py -f Entertainment_11Feb2021_134 -r 2
+$ python comments_extractor.py -f Entertainment_11Feb2021_134 -r 2
 ```
 #### Output
 * Path: .\Downloads\Entertainment_11Feb2021_134\comment.txt
@@ -97,7 +97,7 @@ python comments_extractor.py -f Entertainment_11Feb2021_134 -r 2
 * Set the path in `btm_training.py`
 * Run in command line
 ```Python
-python btm_training.py [-n N_REVIEWS] [-t N_TOPICS] [-s CHUNK_SIZE] [-o OUTPUT_FILENAME]
+$ python btm_training.py [-n N_REVIEWS] [-t N_TOPICS] [-s CHUNK_SIZE] [-o OUTPUT_FILENAME]
 ```
 #### Parameters
 * `-n` is the number of reviews that are randomly selected as training samples. Default = 1000. If n = -1, all reviews will be selected.
@@ -107,7 +107,7 @@ python btm_training.py [-n N_REVIEWS] [-t N_TOPICS] [-s CHUNK_SIZE] [-o OUTPUT_F
 #### Examples
 * To train a BTM model with 3,000 reviews and output into 30 topics:
 ```Python
-python btm_training.py -n 3000 -t 30
+$ python btm_training.py -n 3000 -t 30
 ```
 The vocabulary will be output as `btm_3000_30.vcb`. The trained model will be output as `btm_3000_30.mdl`.
 
@@ -119,19 +119,19 @@ The vocabulary will be output as `btm_3000_30.vcb`. The trained model will be ou
 ### Permission & third-party lib analysis
 1. Run static analysis
 ```Python
-python static_analyzer.py apk_folder
+$ python static_analyzer.py apk_folder
 ```
 Output：```apk_folder/Static_results/package_name.json```: json files containing permission and tracker results.
 2. Summarize the static results
 ```Python
-python summarize_static_analysis top_apk_folder
+$ python summarize_static_analysis top_apk_folder
 ```
 Output: ```top_apk_folder/static_result.txt```: txt file with summarized data seperated by '||', which could be easily imported to Excel.
 ### VirusTotal
 1. Setup the ```api_key```
 2. Upload apk and get reports from VirusTotal. (You may need to run this for several times to collect all reports)
 ```Python
-python virus_total.py top_apk_folder
+$ python virus_total.py top_apk_folder
 ```
 Output: ```top_apk_folder/vt_restuls.txt```: txt file containing number of engines that detected malware and the package name of corrusponding apk, seperated by '||'.
 
@@ -145,11 +145,11 @@ $ adb devices
 ```
 2. Run Lumen testing
 ```Python
-python lumen_script.py apk_folder device_id
+$ python lumen_script.py apk_folder device_id
 ```
 Output: extract Lumen data after testing every 10 apps as ```apk_folder/lumen_xx.db```
 3. Summarize data 
 ```Python
-python summarize_lumen_result.py top_apk_folder
+$ python summarize_lumen_result.py top_apk_folder
 ```
 Output: ```lumen_privacy.txt``` and ```lumen_flow.txt```
