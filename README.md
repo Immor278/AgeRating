@@ -65,12 +65,17 @@ $ python app_downloader.py
 #### Example 2
 * To download top free apps from google store accoring to an app list:
 ```Python
-$ python app_review_downloader.py -l path_to_list
+$ python app_downloader.py -l path_to_list
 ```
 #### Example 3
 * To download apps from APKpure according to an app list:
 ```Python
-$ python app_review_downloader.py -s apkpure -l path_to_list
+$ python app_downloader.py -s apkpure -l path_to_list
+```
+#### Example 4
+* To download apps from category ```FAMILY```:
+```Python
+$ python app_downloader.py -c FAMILY
 ```
 ## Comments extractor
 ### Usage
