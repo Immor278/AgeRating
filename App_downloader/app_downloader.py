@@ -1,12 +1,14 @@
 # app_downloader.py
 
-import os
-import sys
 import argparse
-import misc
+import os
 import shutil
-from app_review_downloader import obtain_app_list, download_app_and_review, download_app_apkpure
+import sys
+
+import misc
+from app_review_downloader import (download_app_and_review, download_app_apkpure, obtain_app_list)
 from duplicate_remover import remove_duplicate_apk
+
 
 class App_downloader:
     hash_list = r"C:\Age_Rating\Apk\Apk_list\apk_list.txt"
@@ -24,6 +26,12 @@ class App_downloader:
         self.set_category(category)
         
     def download_by_category(self, category):
+        if category == 'APPLICATION':
+            self.type = 'NEW_FREE'
+        elif category == 'NEW_FAMILY':
+            category = 'FAMILY'
+            self.type = 'NEW_FAMILY'
+
         app_list = obtain_app_list(category, self.type, str(self.n_apps), self.save_path)
         download_app_and_review(app_list, str(self.n_reviews), self.save_path)
         self.clean_up(category)
@@ -57,17 +65,17 @@ class App_downloader:
         misc.rename_folder_by_size(save_path, misc.get_n_files(apk_folder))
 
     def start_download(self):
-        if self.app_list == '':     # download by categories
-            for category in self.categories:
-                self.download_by_category(category)
-        elif self.category == '':   # download by app list
+        if self.app_list == '':
+            if self.category == '':                     
+                for category in self.categories:
+                    self.download_by_category(category)     # download by categories
+            else:                                           # download a specific category
+                self.download_by_category(self.category)
+        elif self.category == '':                           # download by app list
             if self.store == 'google':
                 self.download_by_app_list()
             elif self.store == 'apkpure':
                 self.download_by_app_list_apkpure()
-                
-        else:                       # download a specific category
-            self.download_by_category(self.category)
 
     def set_store(self, store):
         if store:
@@ -114,8 +122,10 @@ class App_downloader:
         # 'TOOLS',
         # 'TRAVEL_AND_LOCAL',
         # 'VIDEO_PLAYERS',
-        'WEATHER'
-        # 'FAMILY'
+        # 'WEATHER',
+        # 'FAMILY',
+        # 'NEW_FAMILY',
+        'APPLICATION'
     ]
 
 def main():
@@ -126,6 +136,7 @@ def main():
     args = parser.parse_args()
 
     App_downloader(args.s, args.l, args.c).start_download()
+    # App_downloader(args.s, args.l, args.c).clean_up('APPLICATION')
 
 if __name__ == "__main__":
     main()
