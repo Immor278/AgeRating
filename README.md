@@ -63,7 +63,7 @@ FAMILY_PRETEND = 'FAMILY_PRETEND'
 $ python app_downloader.py
 ```
 #### Example 2
-* To download top free apps from google store accoring to an app list:
+* To download apps from google store accoring to an app list:
 ```Python
 $ python app_downloader.py -l path_to_list
 ```
